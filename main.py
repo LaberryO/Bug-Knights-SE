@@ -15,20 +15,46 @@ clock = pygame.time.Clock();
 screen = pygame.display.set_mode(Screen().getSize());
 
 # 변수 초기화
+lastSpawnTime = 0;
+prevTime = time.time();
 
 # 색상 선언
 black = (0,0,0);
 
 # 리스트
-monster = MobFly();
+monsters = [];
+
+# 리셋
+def resetGame():
+    global monsters;
+
+    monsters = [];
 
 # 게임 루프
 while True:
+    # 델타 타임
+    now = time.time();
+    deltaTime = now - prevTime;
+    prevTime = now;
+
     for event in pygame.event.get():
         if event.type == pygame.locals.QUIT :
             sys.exit();
+    
+    if now - lastSpawnTime > 0.5 :
+        monsters.append(MobFly());
+        lastSpawnTime = now;
 
     screen.fill(black);
-    monster.draw(screen);
+    
+    i = 0;
+    while i < len(monsters):
+        monsters[i].move(deltaTime);
+        monsters[i].draw(screen);
+        if monsters[i].offScreen():
+            del monsters[i];
+            i -= 1;
+        i += 1;
+
 
     pygame.display.update();
