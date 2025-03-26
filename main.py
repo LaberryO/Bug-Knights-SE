@@ -17,6 +17,7 @@ screen = pygame.display.set_mode(Screen().getSize());
 # 변수 초기화
 lastSpawnTime = 0;
 prevTime = time.time();
+inGame = True;
 
 # 색상 선언
 black = (0,0,0);
@@ -31,7 +32,7 @@ def resetGame():
     monsters = [];
 
 # 게임 루프
-while True:
+while inGame:
     # 델타 타임
     now = time.time();
     deltaTime = now - prevTime;
@@ -39,6 +40,7 @@ while True:
 
     for event in pygame.event.get():
         if event.type == pygame.locals.QUIT :
+            inGame = False;
             sys.exit();
     
     if now - lastSpawnTime > 0.5 :
