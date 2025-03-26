@@ -12,12 +12,13 @@ class Player(Entity):
         self.y = Screen().getHeight() - 70;
         self.speed = Screen().getWidth() / 2.5;
         self.heading = 0;
+        self.size = 64;
         # Image
         self.image = [
-            rescale(imageLoader("player_0.png"), 64),
-            rescale(imageLoader("player_1.png"), 64),
-            rescale(imageLoader("player_2.png"), 64),
-            rescale(imageLoader("player_3.png"), 64)
+            rescale(imageLoader("player_0.png"), self.size),
+            rescale(imageLoader("player_1.png"), self.size),
+            rescale(imageLoader("player_2.png"), self.size),
+            rescale(imageLoader("player_3.png"), self.size)
         ];
     def move(self, keys, deltaTime):
         # 키 떼면 작동하게 하려고 했는데 안됨;
@@ -26,7 +27,7 @@ class Player(Entity):
         if keys[pygame.K_LEFT] and self.x > 0:
             self.x -= self.speed * deltaTime;
             self.heading = 3;
-        if keys[pygame.K_RIGHT] and self.x < Screen().getWidth():
+        if keys[pygame.K_RIGHT] and self.x < Screen().getWidth() - self.size:
             self.x += self.speed * deltaTime;
             self.heading = 1;
     def draw(self, screen):
