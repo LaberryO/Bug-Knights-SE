@@ -5,6 +5,7 @@ import pygame.locals;
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
 from Resource.Entity.Player import Player;
+from Resource.Entity.Bullet import Bullet;
 
 # main.py를 기준으로 경로 설정
 os.chdir(os.path.dirname(os.path.abspath(__file__)));
@@ -17,8 +18,10 @@ screen = pygame.display.set_mode(Screen().getSize());
 
 # 변수 초기화
 lastSpawnTime = 0;
+lastBulletTime = 0;
 prevTime = time.time();
 inGame = True;
+misses = 0;
 
 # Color
 black = (0,0,0);
@@ -28,13 +31,16 @@ customGreen = (168, 255, 108);
 # Moveable Object
 monsters = [];
 player = Player();
+bullets = [];
 
 # Reset Function
 def resetGame():
-    global monsters, player;
+    global monsters, player, bullets, misses;
 
     monsters = [];
     player = Player();
+    bullets = [];
+    misses = 0;
 
 # Main Loop
 while inGame:
@@ -45,12 +51,22 @@ while inGame:
 
     # Game Quit
     for event in pygame.event.get():
-        if event.type == pygame.locals.QUIT :
+        if event.type == pygame.QUIT :
             inGame = False;
             sys.exit();
+        # 공격 종료 감지
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
+                player.idle();
     
     # Pressed Key
-    pressed_keys = pygame.key.get_pressed();
+    pressedKeys = pygame.key.get_pressed();
+
+    # Bullet Fire
+    if now - lastBulletTime > 0.1:
+        if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
+            player.attack(bullets);
+            lastBulletTime = now;
 
     # Monster Spawn
     if now - lastSpawnTime > 0.5 :
@@ -60,8 +76,19 @@ while inGame:
     # Background
     screen.fill(customYellow);
     
+    # Bullet Movement
+    i = 0;
+    while i < len(bullets):
+        bullets[i].move(deltaTime);
+        bullets[i].draw(screen);
+        if bullets[i].offScreen():
+            del bullets[i];
+            misses += 1;
+            i -= 1;
+        i += 1;
+    
     # Player Movement
-    player.move(pressed_keys, deltaTime);
+    player.move(pressedKeys, deltaTime);
     player.draw(screen);
 
     # Monster Movement
@@ -73,6 +100,5 @@ while inGame:
             del monsters[i];
             i -= 1;
         i += 1;
-
 
     pygame.display.update();
