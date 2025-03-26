@@ -20,6 +20,7 @@ class Player(Entity):
             rescale(imageLoader("player_3.png"), 64)
         ];
     def move(self, keys, deltaTime):
+        # 키 떼면 작동하게 하려고 했는데 안됨;
         if keys == []:
             self.heading = 2;
         if keys[pygame.K_LEFT] and self.x > 0:
