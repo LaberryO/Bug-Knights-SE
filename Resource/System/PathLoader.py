@@ -1,7 +1,7 @@
 import os;
 
-def ImageLoader(fileName):
+def imageLoader(fileName):
     return os.path.join("Resource", "Image", fileName);
 
-def FontLoader(fontName):
+def fontLoader(fontName):
     return os.path.join("Resource", "Font", fontName);
