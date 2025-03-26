@@ -1,11 +1,11 @@
-import os, pygame, sys, random, time;
+import os, pygame, sys, time;
 import pygame.locals;
 
 # 사용자 지정 객체
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
 from Resource.Entity.Player import Player;
-from Resource.Entity.Bullet import Bullet;
+# from Resource.Entity.Bullet import Bullet;
 
 # main.py를 기준으로 경로 설정
 os.chdir(os.path.dirname(os.path.abspath(__file__)));
