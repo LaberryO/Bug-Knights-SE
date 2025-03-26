@@ -12,7 +12,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)));
 
 # 기초 설정
 pygame.init();
-pygame.display.set_caption("벌레 전사 2 - 또다른 모험의 시작");
+pygame.display.set_caption("벌레 전사 2 - 또 다른 모험의 시작");
 clock = pygame.time.Clock();
 screen = pygame.display.set_mode(Screen().getSize());
 
