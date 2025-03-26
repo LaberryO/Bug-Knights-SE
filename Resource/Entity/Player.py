@@ -28,8 +28,6 @@ class Player(Entity):
         if self.isAttack:
             self.speed = self.defaultSpeed / 2;
             self.heading = 2;
-        else:
-            self.speed = self.defaultSpeed;
         # 안누르면 위 보게
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             self.heading = 2;
@@ -49,9 +47,9 @@ class Player(Entity):
         self.isAttack = True;
         # 몇발 쐈는지 체크하는 변수
         self.shots += 1;
-        # print(f"Attack triggered, total shots: {self.shots}");
         bullets.append(Bullet(self, self.x+(self.size/2)));
 
     def idle(self):
         self.isAttack = False;
+        self.speed = self.defaultSpeed;
 
