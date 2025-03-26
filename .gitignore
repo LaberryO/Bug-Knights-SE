@@ -1,0 +1,6 @@
+# Pyinstaller
+build/
+dist/
+
+# Python
+__pycache__
