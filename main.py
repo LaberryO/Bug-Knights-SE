@@ -4,6 +4,7 @@ import pygame.locals;
 # 사용자 지정 객체
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
+from Resource.Entity.Player import Player;
 
 # main.py를 기준으로 경로 설정
 os.chdir(os.path.dirname(os.path.abspath(__file__)));
@@ -19,36 +20,51 @@ lastSpawnTime = 0;
 prevTime = time.time();
 inGame = True;
 
-# 색상 선언
+# Color
 black = (0,0,0);
+customYellow = (255, 199, 30);
+customGreen = (168, 255, 108);
 
-# 리스트
+# Moveable Object
 monsters = [];
+player = Player();
 
-# 리셋
+# Reset Function
 def resetGame():
-    global monsters;
+    global monsters, player;
 
     monsters = [];
+    player = Player();
 
-# 게임 루프
+# Main Loop
 while inGame:
-    # 델타 타임
+    # DeltaTime
     now = time.time();
     deltaTime = now - prevTime;
     prevTime = now;
 
+    # Game Quit
     for event in pygame.event.get():
         if event.type == pygame.locals.QUIT :
             inGame = False;
             sys.exit();
     
+    # Pressed Key
+    pressed_keys = pygame.key.get_pressed();
+
+    # Monster Spawn
     if now - lastSpawnTime > 0.5 :
         monsters.append(MobFly());
         lastSpawnTime = now;
 
-    screen.fill(black);
+    # Background
+    screen.fill(customYellow);
     
+    # Player Movement
+    player.move(pressed_keys, deltaTime);
+    player.draw(screen);
+
+    # Monster Movement
     i = 0;
     while i < len(monsters):
         monsters[i].move(deltaTime);
