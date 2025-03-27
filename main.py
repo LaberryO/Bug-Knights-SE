@@ -33,7 +33,7 @@ customYellow = (255, 199, 30);
 customGreen = (168, 255, 108);
 
 # 이미지 정의
-gameOverImage = pygame.image.load("Resource/Image/game_over.png");
+gameOverImage = pygame.image.load("Resource/Image/game_over.png"); # 임시 이미지
 
 # Moveable Object
 monsters = [];
