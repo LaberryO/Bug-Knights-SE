@@ -14,6 +14,8 @@ class MobFly(Entity):
         self.y = -100;
         self.dy = 0.1;
         self.accSpeed = 0.15;
+        self.damage = 1;
+        self.isDamaged = False;
 
         # Image
         self.image = [
