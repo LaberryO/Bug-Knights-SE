@@ -21,6 +21,12 @@ class Screen:
     def getSize(self):
         return self.getWidth(), self.getHeight();
 
+    def getCenterX(self):
+        return self.width / 2;
+
+    def getCenterY(self):
+        return self.height / 2;
+
     # Setter
     def setWidth(self, width):
         self.width = width;
