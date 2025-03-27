@@ -9,7 +9,7 @@ import random, pygame;
 class MobFly(Entity):
     # 초기값 설정
     def __init__(self):
-        self.size = 64;
+        self.size = 48;
         self.x = random.randint(0, Screen().getWidth() - self.size);
         self.y = -100;
         self.dy = 0.1;
