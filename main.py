@@ -111,7 +111,6 @@ while inGame:
             continue;
         i += 1;
     
-
     # 몬스터 피격
     i = 0;
     while i < len(monsters):
