@@ -42,3 +42,7 @@ class MobFly(Entity):
     
     def offScreen(self):
         return self.y > Screen().getHeight();
+
+    def takeHit(self, bullets):
+        # 피타고라스 정리를 활용한 원형 거리 계산법
+        return (self.x + self.size / 2 - bullets.x)**2 + (self.y + self.size / 2 - bullets.y)**2 < (self.size / 2)**2
