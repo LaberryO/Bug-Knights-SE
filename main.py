@@ -22,11 +22,18 @@ lastBulletTime = 0;
 prevTime = time.time();
 inGame = True;
 misses = 0;
+isDeath = False;
+
+# 글꼴 정의
+defaultFont = pygame.font.Font("Resoruce/Ui/Font/NanumBarunGothic.ttf", 20);
 
 # 색상 정의
 black = (0,0,0);
 customYellow = (255, 199, 30);
 customGreen = (168, 255, 108);
+
+# 이미지 정의
+gameOverImage = pygame.image.load("Resource/Image/game_over.png");
 
 # Moveable Object
 monsters = [];
@@ -63,7 +70,7 @@ while inGame:
     pressedKeys = pygame.key.get_pressed();
 
     # 탄막 발사
-    if now - lastBulletTime > 0.1:
+    if now - lastBulletTime > 0.15:
         if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
             player.attack(bullets);
             lastBulletTime = now;
@@ -99,11 +106,12 @@ while inGame:
     while i < len(monsters):
         monsters[i].move(deltaTime);
         monsters[i].draw(screen);
-        if monsters[i].offScreen():
+        if monsters[i].offScreen() or monsters[i].isDamaged:
             del monsters[i];
             continue;
         i += 1;
     
+
     # 몬스터 피격
     i = 0;
     while i < len(monsters):
@@ -116,5 +124,20 @@ while inGame:
                 break;
             j += 1;
         i += 1;
+
+    for monster in monsters:
+        if player.hitBy(monster):
+            print("충돌 발생!")
+            if not monster.isDamaged:
+                isDeath = player.damage(monster);
+                monster.isDamaged = True;
+                if isDeath:
+                    screen.blit(gameOverImage, (Screen().getCenterX() - 50, Screen().getCenterY() - 50));
+                    while True:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                sys.exit();
+                        pygame.display.update();
+
 
     pygame.display.update();
