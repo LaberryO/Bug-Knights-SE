@@ -12,7 +12,7 @@ class Bullet(Entity):
         self.x = x;
         self.y = self.player.y - 10;
         self.size = 12;
-        self.velocity = 1;
+        self.velocity = 2;
         self.speed = Screen().getHeight() / 4;
 
         # Image

@@ -63,7 +63,7 @@ while inGame:
     pressedKeys = pygame.key.get_pressed();
 
     # 탄막 발사
-    if now - lastBulletTime > 0.1:
+    if now - lastBulletTime > 0.15:
         if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
             player.attack(bullets);
             lastBulletTime = now;
