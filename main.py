@@ -23,6 +23,9 @@ prevTime = time.time();
 inGame = True;
 misses = 0;
 
+# 글꼴 정의
+defaultFont = pygame.font.Font("Resoruce/Ui/Font/NanumBarunGothic.ttf", 20);
+
 # 색상 정의
 black = (0,0,0);
 customYellow = (255, 199, 30);
