@@ -25,7 +25,7 @@ misses = 0;
 isDeath = False;
 
 # 글꼴 정의
-defaultFont = pygame.font.Font("Resoruce/Ui/Font/NanumBarunGothic.ttf", 20);
+defaultFont = pygame.font.Font("Resource/Ui/Font/NanumBarunGothic.ttf", 20);
 
 # 색상 정의
 black = (0,0,0);
@@ -127,7 +127,6 @@ while inGame:
 
     for monster in monsters:
         if player.hitBy(monster):
-            print("충돌 발생!")
             if not monster.isDamaged:
                 isDeath = player.damage(monster);
                 monster.isDamaged = True;
