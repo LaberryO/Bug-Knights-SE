@@ -1,11 +1,11 @@
-import os, pygame, sys, time;
+import os, pygame, sys, time, random;
 import pygame.locals;
 
 # 사용자 지정 객체
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
 from Resource.Entity.Player import Player;
-# from Resource.Entity.Bullet import Bullet;
+from Resource.Entity.Bullet import Bullet;
 
 # main.py를 기준으로 경로 설정
 os.chdir(os.path.dirname(os.path.abspath(__file__)));
@@ -77,7 +77,10 @@ while inGame:
 
     # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
-        monsters.append(MobFly());
+        # 개체수 랜덤
+        spawnValue = random.randint(1, 4);
+        for _ in range(spawnValue):
+            monsters.append(MobFly());
         lastSpawnTime = now;
 
     # 뒷 배경
@@ -108,6 +111,20 @@ while inGame:
             continue;
         i += 1;
     
+
+    # 몬스터 피격
+    i = 0;
+    while i < len(monsters):
+        j = 0;
+        while j < len(bullets):
+            if monsters[i].takeHit(bullets[j]):
+                del monsters[i];
+                del bullets[j];
+                i -= 1;
+                break;
+            j += 1;
+        i += 1;
+
     for monster in monsters:
         if player.hitBy(monster):
             print("충돌 발생!")
@@ -121,5 +138,6 @@ while inGame:
                             if event.type == pygame.QUIT:
                                 sys.exit();
                         pygame.display.update();
+
 
     pygame.display.update();
