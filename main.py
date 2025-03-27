@@ -23,7 +23,7 @@ prevTime = time.time();
 inGame = True;
 misses = 0;
 
-# Color
+# 색상 정의
 black = (0,0,0);
 customYellow = (255, 199, 30);
 customGreen = (168, 255, 108);
@@ -33,7 +33,7 @@ monsters = [];
 player = Player();
 bullets = [];
 
-# Reset Function
+# 리셋
 def resetGame():
     global monsters, player, bullets, misses;
 
@@ -42,14 +42,14 @@ def resetGame():
     bullets = [];
     misses = 0;
 
-# Main Loop
+# 메인 루프
 while inGame:
     # DeltaTime
     now = time.time();
     deltaTime = now - prevTime;
     prevTime = now;
 
-    # Game Quit
+    # 게임 종료
     for event in pygame.event.get():
         if event.type == pygame.QUIT :
             inGame = False;
@@ -59,24 +59,24 @@ while inGame:
             if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
                 player.idle();
     
-    # Pressed Key
+    # 키 입력 감지
     pressedKeys = pygame.key.get_pressed();
 
-    # Bullet Fire
+    # 탄막 발사
     if now - lastBulletTime > 0.1:
         if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
             player.attack(bullets);
             lastBulletTime = now;
 
-    # Monster Spawn
+    # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
         monsters.append(MobFly());
         lastSpawnTime = now;
 
-    # Background
+    # 뒷 배경
     screen.fill(customYellow);
     
-    # Bullet Movement
+    # 탄막 움직임
     i = 0;
     while i < len(bullets):
         bullets[i].move(deltaTime);
@@ -84,21 +84,21 @@ while inGame:
         if bullets[i].offScreen():
             del bullets[i];
             misses += 1;
-            i -= 1;
+            continue;
         i += 1;
     
-    # Player Movement
+    # 플레이어 움직임
     player.move(pressedKeys, deltaTime);
     player.draw(screen);
 
-    # Monster Movement
+    # 몬스터 움직임
     i = 0;
     while i < len(monsters):
         monsters[i].move(deltaTime);
         monsters[i].draw(screen);
         if monsters[i].offScreen():
             del monsters[i];
-            i -= 1;
+            continue;
         i += 1;
 
     pygame.display.update();
