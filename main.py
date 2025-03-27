@@ -1,4 +1,4 @@
-import os, pygame, sys, time;
+import os, pygame, sys, time, random;
 import pygame.locals;
 
 # 사용자 지정 객체
@@ -70,7 +70,10 @@ while inGame:
 
     # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
-        monsters.append(MobFly());
+        # 개체수 랜덤
+        spawnValue = random.randint(1, 4);
+        for _ in range(spawnValue):
+            monsters.append(MobFly());
         lastSpawnTime = now;
 
     # 뒷 배경
