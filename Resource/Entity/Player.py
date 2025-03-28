@@ -54,7 +54,7 @@ class Player(Entity):
         self.isAttack = True;
         # 몇발 쐈는지 체크하는 변수
         self.shots += 1;
-        bullets.append(Bullet(self, self.centerX));
+        bullets.append(Bullet(self, self.x + self.centerX));
 
     def idle(self):
         self.isAttack = False;
