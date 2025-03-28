@@ -18,8 +18,8 @@ class MobBee(Entity):
 
         # Image
         self.image = [
-            rescale(imageLoader("mobFly_0.png"), self.size),
-            rescale(imageLoader("mobFly_1.png"), self.size)
+            rescale(imageLoader("mobBee_0.png"), self.size),
+            rescale(imageLoader("mobBee_1.png"), self.size)
         ];
 
         # 애니메이션 변수

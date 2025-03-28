@@ -4,6 +4,7 @@ import pygame.locals;
 # 사용자 지정 객체
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
+from Resource.Entity.MobBee import MobBee;
 from Resource.Entity.Player import Player;
 from Resource.Entity.Bullet import Bullet;
 
@@ -77,10 +78,14 @@ while inGame:
 
     # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
+        selectedMonster = random.randint(1, 2);
         # 개체수 랜덤
         spawnValue = random.randint(1, 4);
         for _ in range(spawnValue):
-            monsters.append(MobFly());
+            if selectedMonster == 1:
+                monsters.append(MobBee());
+            else:
+                monsters.append(MobFly());
         lastSpawnTime = now;
 
     # 뒷 배경
