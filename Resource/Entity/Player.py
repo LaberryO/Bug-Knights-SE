@@ -69,10 +69,12 @@ class Player(Entity):
         # monsters.x < self.x + self.size - self.centerX / 2 오른쪽 피격
         # monsters.y + monsters.size > self.y + self.centerY / 2 위쪽 피격
         # 아래쪽은 어차피 감지 안해도 됨
+        # 아래쪽 감지 안해서 죽음 FUCK
         return (
             monster.x + monster.size > self.x + self.centerX / 2 and
             monster.x < self.x + self.size - self.centerX / 2 and
-            monster.y + monster.size > self.y + self.centerY / 2
+            monster.y + monster.size > self.y + self.centerY / 2 and
+            monster.y < self.y + self.size - self.centerY / 2
         )
     
     def damage(self, monster):
