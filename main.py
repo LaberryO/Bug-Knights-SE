@@ -78,12 +78,12 @@ while inGame:
 
     # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
-        selectedMonster = random.randint(1, 2);
+        selectedMonster = random.randint(1, 4);
         # 개체수 랜덤
         spawnValue = random.randint(1, 4);
         for _ in range(spawnValue):
             if selectedMonster == 1:
-                monsters.append(MobBee());
+                monsters.append(MobBee(player));
             else:
                 monsters.append(MobFly());
         lastSpawnTime = now;
