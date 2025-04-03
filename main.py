@@ -5,6 +5,7 @@ import pygame.locals;
 from Resource.Data.Screen import Screen;
 from Resource.Entity.MobFly import MobFly;
 from Resource.Entity.MobBee import MobBee;
+from Resource.Entity.MobWater import MobWater;
 from Resource.Entity.Player import Player;
 from Resource.Entity.Bullet import Bullet;
 
@@ -84,6 +85,8 @@ while inGame:
         for _ in range(spawnValue):
             if selectedMonster == 1:
                 monsters.append(MobBee(player));
+            elif selectedMonster == 2:
+                monsters.append(MobWater());
             else:
                 monsters.append(MobFly());
         lastSpawnTime = now;
