@@ -79,7 +79,7 @@ while inGame:
 
     # 몬스터 스폰
     if now - lastSpawnTime > 0.5 :
-        selectedMonster = random.randint(1, 4);
+        selectedMonster = random.randint(1, 8);
         # 개체수 랜덤
         spawnValue = random.randint(1, 4);
         for _ in range(spawnValue):

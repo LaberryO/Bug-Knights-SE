@@ -49,7 +49,6 @@ class MobBee(Entity):
         if self.state == "idle":
             # 감지 범위 안에 들어오면 경고 상태로 전환
             if distance < self.detectRange:
-                print("Player detected! Entering alert mode.");
                 self.state = "alert";
                 self.alertStart = time.time();  # 경고 시작 시간 기록
             else:

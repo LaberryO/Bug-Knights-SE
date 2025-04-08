@@ -19,8 +19,9 @@ class MobWater(Entity):
 
         # Image
         self.image = [
-            rescale(imageLoader("mobFly_0.png"), self.size),
-            rescale(imageLoader("mobFly_1.png"), self.size)
+            rescale(imageLoader("mobWater_0.png"), self.size),
+            rescale(imageLoader("mobWater_1.png"), self.size),
+            rescale(imageLoader("mobWater_2.png"), self.size)
         ];
     
         # 애니메이션 변수
