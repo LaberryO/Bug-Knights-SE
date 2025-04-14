@@ -53,12 +53,12 @@ class Game:
         self.player = Player();
         self.bullets = [];
 
-    def createButtons(self, buttonTexts, mousePos):
+    def createButtons(self, buttonTexts, mousePos, y):
         buttons = []
 
         for i, text in enumerate(buttonTexts):
             btnRect = pygame.Rect(0, 0, 250, 60);
-            btnRect.center = (Screen().getCenterX(), Screen().getCenterY() + i * 80);
+            btnRect.center = (Screen().getCenterX(), y + i * 80);
 
             mousePos = pygame.mouse.get_pos();
 
@@ -71,6 +71,12 @@ class Game:
 
         return buttons;
 
+    def midTextRender(self, text, addY):
+        self.screen.blit(text, (
+            Screen().getCenterX() - text.get_width() // 2,
+            Screen().getCenterY() + addY
+        ));
+
     # 타이틀 화면
     def title(self):
         buttonTexts = ["게임 시작", "게임 설명", "게임 종료"];
@@ -79,7 +85,7 @@ class Game:
             mousePos = pygame.mouse.get_pos();
 
             # 버튼 생성
-            buttons = self.createButtons(buttonTexts, mousePos);
+            buttons = self.createButtons(buttonTexts, mousePos, Screen().getCenterY());
 
             self.screen.fill(Color().lightGray());
 
@@ -120,7 +126,7 @@ class Game:
                 elif event.type == pygame.MOUSEMOTION:
                     mousePos = pygame.mouse.get_pos();
                     buttons = [];
-                    self.createButtons(buttonTexts, mousePos);
+                    self.createButtons(buttonTexts, mousePos, Screen().getCenterY());
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mousePos = pygame.mouse.get_pos();
                     for _, rect, label, _ in buttons:
@@ -135,35 +141,28 @@ class Game:
     
     # 게임 설명 화면
     def gameInfo(self):
-        def defaultFontRender(text, addY):
-            self.screen.blit(text, (
-                Screen().getCenterX() - text.get_width() // 2,
-                Screen().getCenterY() + addY
-            ));
-        
+        infoTexts = [
+            "벌레 전사의 새로운 모험을 다룬 슈팅게임입니다!",
+            "최대한 많은 벌레를 죽이고 그들의 정점에 서십시오!",
+            "← : 왼쪽으로 이동합니다.",
+            "→ : 오른쪽으로 이동합니다.",
+            "↑ 또는 Space Bar : 거미줄을 발사합니다.",
+            "LCTRL + ← 또는 LCTRL + →",
+            "진행 방향으로 구릅니다. (일시적으로 무적 상태가 됩니다.)",
+            "ESC를 눌러 돌아갑니다..."
+        ];
+
         while True:
             self.screen.fill(Color().white());
+            tempY = -270;
 
-            # 설명 텍스트
-            infoText = self.defaultFont.render("벌레 전사의 새로운 모험을 다룬 슈팅게임입니다!", True, Color().black());
-            defaultFontRender(infoText, -150);
-            infoText2 = self.defaultFont.render("최대한 많은 벌레를 죽이고 그들의 정점에 서십시오!", True, Color().black());
-            defaultFontRender(infoText2, -120);
-
-            leftArrow = self.defaultFont.render("← : 왼쪽으로 이동합니다.", True, Color().black());
-            defaultFontRender(leftArrow, -30);
-            rightArrow = self.defaultFont.render("→ : 오른쪽으로 이동합니다.", True, Color().black());
-            defaultFontRender(rightArrow, 10);
-            howToAttack = self.defaultFont.render("↑ 또는 Space Bar : 거미줄을 발사합니다.", True, Color().black());
-            defaultFontRender(howToAttack, 50);
-            howToDodge = self.defaultFont.render("LCTRL + ← 또는 LCTRL + →", True, Color().black());
-            defaultFontRender(howToDodge, 90);
-            howToDodge2 = self.defaultFont.render("진행 방향으로 구릅니다. (일시적으로 무적 상태가 됩니다.)", True, Color().black());
-            defaultFontRender(howToDodge2, 110);
-
-            # 뒤로가기 안내
-            backText = self.defaultFont.render("ESC를 눌러 돌아갑니다...", True, Color().gray());
-            defaultFontRender(backText, 200);
+            for i in range(len(infoTexts)):
+                text = self.defaultFont.render(infoTexts[i], True, Color().black());
+                if i == 2 or i == 7:
+                    tempY += 90;
+                else:
+                    tempY += 40;
+                self.midTextRender(text, tempY);
 
             pygame.display.update();
 
@@ -173,6 +172,76 @@ class Game:
                     sys.exit();
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     return;  # title() 루프로 복귀
+
+    # 게임 오버
+    def gameOver(self):
+        texts = [
+            "벌레 전사는 최후를 맞이했습니다.",
+            "Score",
+            f"당신의 전사는 {self.score}의 명성을 얻었습니다.",
+            "Miss",
+            f"당신의 전사는 {self.misses}번 빗맞췄습니다."
+        ];
+
+        buttonsTexts = [
+            "타이틀로",
+            "게임 종료"
+        ];
+
+        while True:
+            mousePos = pygame.mouse.get_pos();
+
+            # 버튼 생성
+            buttons = self.createButtons(buttonsTexts, mousePos, Screen().getCenterY() + 100);
+
+            self.screen.fill(Color().white());
+
+            # 결과 문구
+            tempY = -270;
+            for i in range(len(texts)):
+                text = self.defaultFont.render(texts[i], True, Color().black());
+                if i == 1:
+                    tempY += 90;
+                elif i == 2 or i == 4:
+                    tempY += 20;
+                else:
+                    tempY += 40;
+                
+                self.midTextRender(text, tempY);
+            
+            # 버튼
+            for surface, rect, __, bgColor in buttons:
+                # 배경색
+                pygame.draw.rect(self.screen, bgColor, rect, border_radius=10);
+                # 테두리
+                pygame.draw.rect(self.screen, Color().black(), rect, 3, border_radius=10);
+
+                # 텍스트
+                self.screen.blit(surface, (
+                    rect.centerx - surface.get_width() // 2,
+                    rect.centery - surface.get_height() // 2
+                ));
+            
+            pygame.display.update();
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit();
+                    sys.exit();
+                elif event.type == pygame.MOUSEMOTION:
+                    mousePos = pygame.mouse.get_pos();
+                    buttons = [];
+                    self.createButtons(buttonsTexts, mousePos, Screen().getCenterY() + 100);
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mousePos = pygame.mouse.get_pos();
+                    for _, rect, label, _ in buttons:
+                        if rect.collidepoint(mousePos):
+                            if label == "타이틀로":
+                                self.title();
+                            elif label == "게임 종료":
+                                pygame.quit();
+                                sys.exit();
+    
 
     # 리셋
     def reset(self):
@@ -331,8 +400,7 @@ class Game:
                         if self.score > self.maxScore:
                             self.maxScore = self.score;
                         self.lastScore = self.score;
-                        self.reset();
-                        self.title();
+                        self.gameOver();
     
 
 
