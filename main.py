@@ -1,157 +1,235 @@
 import os, pygame, sys, time, random;
 import pygame.locals;
 
+from pygame.image import load;
+
 # 사용자 지정 객체
 from Resource.Data.Screen import Screen;
+from Resource.Data.Color import Color;
+
 from Resource.Entity.MobFly import MobFly;
 from Resource.Entity.MobBee import MobBee;
 from Resource.Entity.MobWater import MobWater;
 from Resource.Entity.Player import Player;
-from Resource.Entity.Bullet import Bullet;
 
-# main.py를 기준으로 경로 설정
-os.chdir(os.path.dirname(os.path.abspath(__file__)));
+from Resource.System.PathLoader import imageLoader;
 
-# 기초 설정
-pygame.init();
-pygame.display.set_caption("벌레 전사 2 - 또 다른 모험의 시작");
-clock = pygame.time.Clock();
-screen = pygame.display.set_mode(Screen().getSize());
+class Game:
+    def __init__(self):
+        # main.py를 기준으로 경로 설정
+        os.chdir(os.path.dirname(os.path.abspath(__file__)));
+        
+        # 기초 설정
+        pygame.init();
+        pygame.display.set_caption("벌레 전사 2 - 또 다른 모험의 시작");
 
-# 변수 초기화
-lastSpawnTime = 0;
-lastBulletTime = 0;
-prevTime = time.time();
-inGame = True;
-misses = 0;
-isDeath = False;
+        self.clock = pygame.time.Clock();
+        self.screen = pygame.display.set_mode(Screen().getSize());
 
-# 글꼴 정의
-defaultFont = pygame.font.Font("Resource/Ui/Font/NanumBarunGothic.ttf", 20);
+        # Time
+        self.lastSpawnTime = 0;
+        self.lastBulletTime = 0;
+        self.prevTime = time.time();
 
-# 색상 정의
-black = (0,0,0);
-customYellow = (255, 199, 30);
-customGreen = (168, 255, 108);
+        # Status
+        self.inGame = True;
+        self.misses = 0;
+        self.isDeath = False;
+        self.isTitle = False;
 
-# 이미지 정의
-gameOverImage = pygame.image.load("Resource/Image/game_over.png"); # 임시 이미지
+        # 글꼴 정의
+        self.defaultFont = pygame.font.Font("Resource/Ui/Font/NanumBarunGothic.ttf", 20);
 
-# Moveable Object
-monsters = [];
-player = Player();
-bullets = [];
+        # 이미지 정의
+        self.titleImage = load(imageLoader("title_0.png"));
+        self.gameOverImage = load(imageLoader("game_over.png")); # 임시 이미지
 
-# 리셋
-def resetGame():
-    global monsters, player, bullets, misses;
+        # 오브젝트
+        self.monsters = [];
+        self.player = Player();
+        self.bullets = [];
 
-    monsters = [];
-    player = Player();
-    bullets = [];
-    misses = 0;
+    def title(self):
+        buttonTexts = ["게임 시작", "게임 설명", "게임 종료"];
+        buttons = [];
 
-# 메인 루프
-while inGame:
-    # DeltaTime
-    now = time.time();
-    deltaTime = now - prevTime;
-    prevTime = now;
+        # 버튼 생성
+        for i, text in enumerate(buttonTexts):
+            btnSurface = self.defaultFont.render(text, True, Color().black());
+            btnRect = pygame.Rect(0, 0, 250, 60);
+            btnRect.center = (Screen().getCenterX(), Screen().getCenterY() + i * 80);
+            buttons.append((btnSurface, btnRect, text));
 
-    # 게임 종료
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT :
-            inGame = False;
-            sys.exit();
-        # 공격 종료 감지
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                player.idle();
+        
     
-    # 키 입력 감지
-    pressedKeys = pygame.key.get_pressed();
+        while True:
+            self.screen.fill(Color().gray());
 
-    # 탄막 발사
-    if now - lastBulletTime > 0.15:
-        if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
-            player.attack(bullets);
-            lastBulletTime = now;
+            # 타이틀 이미지
+            self.screen.blit(self.titleImage, (
+                Screen().getCenterX() - self.titleImage.get_width() // 2,
+                Screen().getCenterY() // 2 - self.titleImage.get_height() // 2
+            ));
 
-    # 몬스터 스폰
-    if now - lastSpawnTime > 0.5 :
-        selectedMonster = random.randint(1, 8);
-        # 개체수 랜덤
-        spawnValue = random.randint(1, 4);
-        for _ in range(spawnValue):
-            if selectedMonster == 1:
-                monsters.append(MobBee(player));
-            elif selectedMonster == 2:
-                monsters.append(MobWater());
-            else:
-                monsters.append(MobFly());
-        lastSpawnTime = now;
+            # 버튼들
+            for surface, rect, _ in buttons:
+                pygame.draw.rect(self.screen, Color().white(), rect, border_radius=10);
+                pygame.draw.rect(self.screen, Color().black(), rect, 3, border_radius=10);
+                self.screen.blit(surface, (
+                    rect.centerx - surface.get_width() // 2,
+                    rect.centery - surface.get_height() // 2
+                ));
 
-    # 뒷 배경
-    screen.fill(customYellow);
-    
-    # 탄막 움직임
-    i = 0;
-    while i < len(bullets):
-        bullets[i].move(deltaTime);
-        bullets[i].draw(screen);
-        if bullets[i].offScreen():
-            del bullets[i];
-            misses += 1;
-            continue;
-        i += 1;
-    
-    # 플레이어 움직임
-    player.move(pressedKeys, deltaTime);
-    player.update(deltaTime);
+            pygame.display.update();     
 
-    if pressedKeys[pygame.K_LCTRL]:
-        if pressedKeys[pygame.K_LEFT]:
-            player.dodge("left", deltaTime);
-        elif pressedKeys[pygame.K_RIGHT]:
-            player.dodge("right", deltaTime);
-    
-    player.draw(screen);
-
-    # 몬스터 움직임
-    i = 0;
-    while i < len(monsters):
-        monsters[i].move(deltaTime);
-        monsters[i].draw(screen);
-        if monsters[i].offScreen() or monsters[i].isDamaged:
-            del monsters[i];
-            continue;
-        i += 1;
-    
-    # 몬스터 피격
-    i = 0;
-    while i < len(monsters):
-        j = 0;
-        while j < len(bullets):
-            if monsters[i].takeHit(bullets[j]):
-                del monsters[i];
-                del bullets[j];
-                i -= 1;
-                break;
-            j += 1;
-        i += 1;
-
-    for monster in monsters:
-        if player.hitBy(monster):
-            if not monster.isDamaged:
-                isDeath = player.damage(monster);
-                monster.isDamaged = True;
-                if isDeath:
-                    screen.blit(gameOverImage, (Screen().getCenterX() - 50, Screen().getCenterY() - 50));
-                    while True:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit();
+                    sys.exit();
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mousePos = pygame.mouse.get_pos();
+                    for _, rect, label in buttons:
+                        if rect.collidepoint(mousePos):
+                            if label == "게임 시작":
+                                return;
+                            elif label == "게임 설명":
+                                return;
+                            elif label == "게임 종료":
+                                pygame.quit();
                                 sys.exit();
-                        pygame.display.update();
 
+    # 리셋
+    def reset(self):
+        self.monsters = [];
+        self.player = Player();
+        self.bullets = [];
+        self.misses = 0;
+        self.isDeath = False;
+        self.lastSpawnTime = time.time();
+        self.lastBulletTime = time.time();
 
-    pygame.display.update();
+    def spawnMonsters(self):
+        now = time.time();
+        # 몬스터 스폰
+        if now - self.lastSpawnTime > 0.5 :
+            selectedMonster = random.randint(1, 8);
+            # 개체수 랜덤
+            spawnValue = random.randint(1, 4);
+            for _ in range(spawnValue):
+                if selectedMonster == 1:
+                    self.monsters.append(MobBee(self.player));
+                elif selectedMonster == 2:
+                    self.monsters.append(MobWater());
+                else:
+                    self.monsters.append(MobFly());
+            self.lastSpawnTime = now;
+
+    def handleEvents(self):
+        # 게임 종료
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT :
+                self.inGame = False;
+                pygame.quit();
+                sys.exit();
+            # 공격 종료 감지
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
+                    self.player.idle();
+
+    def update(self, deltaTime):
+        # 키 입력 감지
+        pressedKeys = pygame.key.get_pressed();
+    
+        # 탄막 발사
+        if time.time() - self.lastBulletTime > 0.15:
+            if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
+                self.player.attack(self.bullets);
+                self.lastBulletTime = time.time();
+
+        # 이동 및 회피
+        self.player.move(pressedKeys, deltaTime);
+
+        if pressedKeys[pygame.K_LCTRL]:
+            if pressedKeys[pygame.K_LEFT]:
+                self.player.dodge("left", deltaTime);
+            elif pressedKeys[pygame.K_RIGHT]:
+                self.player.dodge("right", deltaTime);
+        
+        self.player.update(deltaTime);
+
+        # 탄막 움직임
+        i = 0;
+        while i < len(self.bullets):
+            self.bullets[i].move(deltaTime);
+            self.bullets[i].draw(self.screen);
+            if self.bullets[i].offScreen():
+                del self.bullets[i];
+                self.misses += 1;
+                continue;
+            i += 1;
+
+        # 몬스터 움직임
+        i = 0;
+        while i < len(self.monsters):
+            self.monsters[i].move(deltaTime);
+            self.monsters[i].draw(self.screen);
+            if self.monsters[i].offScreen() or self.monsters[i].isDamaged:
+                del self.monsters[i];
+                continue;
+            i += 1;
+            
+        self.handleCollisions();
+
+    # 충돌 체크
+    def handleCollisions(self):
+        # Monster
+        i = 0;
+        while i < len(self.monsters):
+            j = 0;
+            while j < len(self.bullets):
+                if self.monsters[i].takeHit(self.bullets[j]):
+                    del self.monsters[i];
+                    del self.bullets[j];
+                    i -= 1;
+                    break;
+                j += 1;
+            i += 1;
+
+        # Player
+        for monster in self.monsters:
+            if self.player.hitBy(monster):
+                if not monster.isDamaged:
+                    self.isDeath = self.player.damage(monster);
+                    monster.isDamaged = True;
+                    if self.isDeath:
+                        self.screen.blit(self.gameOverImage, (Screen().getCenterX() - 50, Screen().getCenterY() - 50));
+                        while True:
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    sys.exit();
+                            pygame.display.update();
+    def run(self):
+        # 타이틀 먼저
+        if not self.isTitle:
+            self.title();
+            self.isTitle = True;
+        
+        # 메인 루프
+        while self.inGame:
+            # DeltaTime
+            now = time.time();
+            deltaTime = now - self.prevTime;
+            self.prevTime = now;
+
+            self.handleEvents();
+            self.spawnMonsters();
+
+            self.screen.fill(Color().customYellow());
+            self.update(deltaTime);
+            self.player.draw(self.screen);
+
+            pygame.display.update();
+
+if __name__ == "__main__":
+    game = Game();
+    game.run();
