@@ -49,21 +49,34 @@ class Game:
         self.player = Player();
         self.bullets = [];
 
-    def title(self):
-        buttonTexts = ["게임 시작", "게임 설명", "게임 종료"];
-        buttons = [];
+    def createButtons(self, buttonTexts, mousePos):
+        buttons = []
 
-        # 버튼 생성
         for i, text in enumerate(buttonTexts):
-            btnSurface = self.defaultFont.render(text, True, Color().black());
             btnRect = pygame.Rect(0, 0, 250, 60);
             btnRect.center = (Screen().getCenterX(), Screen().getCenterY() + i * 80);
-            buttons.append((btnSurface, btnRect, text));
 
-        
+            mousePos = pygame.mouse.get_pos();
+
+            isHover = btnRect.collidepoint(mousePos);
+            bgColor = Color().gray() if isHover else Color().white();
+            textColor = Color().white() if isHover else Color().black();
+
+            btnSurface = self.defaultFont.render(text, True, textColor);
+            buttons.append((btnSurface, btnRect, text, bgColor));
+
+        return buttons;
+
+    def title(self):
+        buttonTexts = ["게임 시작", "게임 설명", "게임 종료"];
     
         while True:
-            self.screen.fill(Color().gray());
+            mousePos = pygame.mouse.get_pos();
+
+            # 버튼 생성
+            buttons = self.createButtons(buttonTexts, mousePos);
+
+            self.screen.fill(Color().lightGray());
 
             # 타이틀 이미지
             self.screen.blit(self.titleImage, (
@@ -72,9 +85,14 @@ class Game:
             ));
 
             # 버튼들
-            for surface, rect, _ in buttons:
-                pygame.draw.rect(self.screen, Color().white(), rect, border_radius=10);
+            for surface, rect, _, bgColor in buttons:
+                # 배경색 (hover 여부에 따라 바뀜)
+                pygame.draw.rect(self.screen, bgColor, rect, border_radius=10);
+
+                # 테두리
                 pygame.draw.rect(self.screen, Color().black(), rect, 3, border_radius=10);
+
+                # 텍스트
                 self.screen.blit(surface, (
                     rect.centerx - surface.get_width() // 2,
                     rect.centery - surface.get_height() // 2
@@ -86,9 +104,13 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit();
                     sys.exit();
+                elif event.type == pygame.MOUSEMOTION:
+                    mousePos = pygame.mouse.get_pos();
+                    buttons = [];
+                    self.createButtons(buttonTexts, mousePos);
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mousePos = pygame.mouse.get_pos();
-                    for _, rect, label in buttons:
+                    for _, rect, label, _ in buttons:
                         if rect.collidepoint(mousePos):
                             if label == "게임 시작":
                                 return;

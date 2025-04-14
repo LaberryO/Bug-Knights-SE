@@ -8,11 +8,11 @@ import pygame;
 class Player(Entity):
     # 초기값 설정
     def __init__(self):
-        self.x = Screen().getWidth() / 2;
+        self.size = 64;
+        self.x = Screen().getCenterX() - self.size / 2;
         self.y = Screen().getHeight() - 70;
         self.speed = Screen().getWidth() / 2.5;
         self.heading = 0;
-        self.size = 64;
         self.shots = 0;
         self.isAttack = False;
         self.defaultSpeed = self.speed;

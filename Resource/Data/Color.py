@@ -7,8 +7,11 @@ class Color:
     def white(self):
         return (255, 255, 255);
 
-    def gray(self):
+    def lightGray(self):
         return (128, 128, 128);
+
+    def gray(self):
+        return (50, 50, 50);
 
     def customYellow(self):
         return (255, 199, 30);
