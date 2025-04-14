@@ -149,6 +149,7 @@ class Game:
             "↑ 또는 Space Bar : 거미줄을 발사합니다.",
             "LCTRL + ← 또는 LCTRL + →",
             "진행 방향으로 구릅니다. (일시적으로 무적 상태가 됩니다.)",
+            "LSHIFT : 필살기를 사용합니다.",
             "ESC를 눌러 돌아갑니다..."
         ];
 
@@ -158,7 +159,7 @@ class Game:
 
             for i in range(len(infoTexts)):
                 text = self.defaultFont.render(infoTexts[i], True, Color().black());
-                if i == 2 or i == 7:
+                if i == 2 or i == 8:
                     tempY += 90;
                 else:
                     tempY += 40;
@@ -326,6 +327,13 @@ class Game:
             maxHealth=5
         );
 
+        # 스킬 쿨타임 표시
+        if self.player.skillTimer > 0:
+            cooldownText = self.defaultFont.render(f"스킬 상태 : {self.player.skillTimer:.1f}초 남음", True, Color().black());
+        else:
+            cooldownText = self.defaultFont.render("스킬 상태 : 준비됨!", True, Color().red());
+        self.screen.blit(cooldownText, (10, 50));
+
         # 키 입력 감지
         pressedKeys = pygame.key.get_pressed();
     
@@ -334,6 +342,9 @@ class Game:
             if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_SPACE]:
                 self.player.attack(self.bullets);
                 self.lastBulletTime = time.time();
+        
+        if pressedKeys[pygame.K_LSHIFT]:
+            self.player.allAttackSkill(self.bullets);
 
         # 이동 및 회피
         self.player.move(pressedKeys, deltaTime);

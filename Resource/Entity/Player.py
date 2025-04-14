@@ -32,6 +32,13 @@ class Player(Entity):
         self.invincibleTime = 0;
         self.invincibleDuration = 0.15; # 지속 시간 (초)
 
+        # Skills
+        self.isUsingSkill = False;
+        self.skillCooldown = 20.0;
+        self.skillDuration = 1.0;
+        self.skillTimer = 0;
+        self.skillStartTime = 0;
+
         # Image
         self.image = [
             rescale(imageLoader("player_0.png"), self.size),
@@ -141,6 +148,19 @@ class Player(Entity):
     
         afterImage = (self.image[self.heading].copy(), (self.x, self.y), time.time());
         self.afterImages.append(afterImage);
+    
+    # 특수 스킬
+    def allAttackSkill(self, bullets):
+        if self.skillTimer > 0 or self.isUsingSkill:
+            return;
+
+        self.isUsingSkill = True;
+        self.skillStartTime = time.time();
+        self.skillTimer = self.skillCooldown;
+    
+        from .Bullet import Bullet
+        for offset in range(0, Screen().getWidth(), 10):
+            bullets.append(Bullet(self, offset));
 
     # 자체 업데이트
     def update(self, deltaTime):
@@ -175,4 +195,12 @@ class Player(Entity):
 
         if self.dodgeTimer > 0:
             self.dodgeTimer -= deltaTime;
+
+        # update 함수 안에 필살기 처리 추가
+        if self.isUsingSkill:
+            if time.time() - self.skillStartTime > self.skillDuration:
+                self.isUsingSkill = False;
+
+        if self.skillTimer > 0:
+            self.skillTimer -= deltaTime;
 
