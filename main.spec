@@ -29,7 +29,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Bug Knights Shooter Edition',
+    name='Bug Knights SE',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
