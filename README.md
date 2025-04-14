@@ -1,2 +1,4 @@
-# Bug Knights 2
-Pygame 라이브러리로 만드는 라베리의 슈팅 게임 (수행평가)
+# Bug Knights Shooter Edition
+Pygame 라이브러리로 제작되었습니다.
+
+개발자: LaberryO (라베리)
