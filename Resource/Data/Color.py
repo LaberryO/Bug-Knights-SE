@@ -13,6 +13,9 @@ class Color:
     def gray(self):
         return (50, 50, 50);
 
+    def red(self):
+        return (255, 0, 0);
+
     def customYellow(self):
         return (255, 199, 30);
 

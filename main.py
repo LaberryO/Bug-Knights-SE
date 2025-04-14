@@ -21,10 +21,14 @@ class Game:
         
         # 기초 설정
         pygame.init();
-        pygame.display.set_caption("벌레 전사 2 - 또 다른 모험의 시작");
+        pygame.display.set_caption("Bug Knights Shooter Edition - 벌레 전사의 새로운 모험");
 
         self.clock = pygame.time.Clock();
         self.screen = pygame.display.set_mode(Screen().getSize());
+
+        self.score = 0;
+        self.lastScore = 0;
+        self.maxScore = 0;
 
         # Time
         self.lastSpawnTime = 0;
@@ -67,6 +71,7 @@ class Game:
 
         return buttons;
 
+    # 타이틀 화면
     def title(self):
         buttonTexts = ["게임 시작", "게임 설명", "게임 종료"];
     
@@ -97,6 +102,14 @@ class Game:
                     rect.centerx - surface.get_width() // 2,
                     rect.centery - surface.get_height() // 2
                 ));
+            
+            lastScoreText = f"Last Score: {self.lastScore}";
+            lastScoreSurface = self.defaultFont.render(lastScoreText, True, Color().black());
+            self.screen.blit(lastScoreSurface, (10, 10));
+
+            MaxScoreText = f"Max Score: {self.maxScore}";
+            MaxScoreSurface = self.defaultFont.render(MaxScoreText, True, Color().black());
+            self.screen.blit(MaxScoreSurface, (10, 30));
 
             pygame.display.update();     
 
@@ -115,10 +128,51 @@ class Game:
                             if label == "게임 시작":
                                 return;
                             elif label == "게임 설명":
-                                return;
+                                self.gameInfo();
                             elif label == "게임 종료":
                                 pygame.quit();
                                 sys.exit();
+    
+    # 게임 설명 화면
+    def gameInfo(self):
+        def defaultFontRender(text, addY):
+            self.screen.blit(text, (
+                Screen().getCenterX() - text.get_width() // 2,
+                Screen().getCenterY() + addY
+            ));
+        
+        while True:
+            self.screen.fill(Color().white());
+
+            # 설명 텍스트
+            infoText = self.defaultFont.render("벌레 전사의 새로운 모험을 다룬 슈팅게임입니다!", True, Color().black());
+            defaultFontRender(infoText, -150);
+            infoText2 = self.defaultFont.render("최대한 많은 벌레를 죽이고 그들의 정점에 서십시오!", True, Color().black());
+            defaultFontRender(infoText2, -120);
+
+            leftArrow = self.defaultFont.render("← : 왼쪽으로 이동합니다.", True, Color().black());
+            defaultFontRender(leftArrow, -30);
+            rightArrow = self.defaultFont.render("→ : 오른쪽으로 이동합니다.", True, Color().black());
+            defaultFontRender(rightArrow, 10);
+            howToAttack = self.defaultFont.render("↑ 또는 Space Bar : 거미줄을 발사합니다.", True, Color().black());
+            defaultFontRender(howToAttack, 50);
+            howToDodge = self.defaultFont.render("LCTRL + ← 또는 LCTRL + →", True, Color().black());
+            defaultFontRender(howToDodge, 90);
+            howToDodge2 = self.defaultFont.render("진행 방향으로 구릅니다. (일시적으로 무적 상태가 됩니다.)", True, Color().black());
+            defaultFontRender(howToDodge2, 110);
+
+            # 뒤로가기 안내
+            backText = self.defaultFont.render("ESC를 눌러 돌아갑니다...", True, Color().gray());
+            defaultFontRender(backText, 200);
+
+            pygame.display.update();
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit();
+                    sys.exit();
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return;  # title() 루프로 복귀
 
     # 리셋
     def reset(self):
@@ -129,6 +183,7 @@ class Game:
         self.isDeath = False;
         self.lastSpawnTime = time.time();
         self.lastBulletTime = time.time();
+        self.score = 0;
 
     def spawnMonsters(self):
         now = time.time();
@@ -157,8 +212,49 @@ class Game:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP or event.key == pygame.K_SPACE:
                     self.player.idle();
+    
+    # 체력 바
+    def drawHealthBar(self, surface, x, y, width, height, currentHealth, maxHealth):
+        x -= width;
+        # 백그라운드 바 (회색)
+        pygame.draw.rect(surface, Color().gray(), (x, y, width, height), border_radius=5);
 
+        # 체력 비율 계산
+        healthRatio = max(0, currentHealth / maxHealth);  # 0 미만으로 안 내려가게
+        currentWidth = int(width * healthRatio);
+
+        # 실제 체력 바 (빨간색)
+        pygame.draw.rect(surface, Color().red(), (x, y, currentWidth, height), border_radius=5);
+
+        # 테두리
+        pygame.draw.rect(surface, Color().black(), (x, y, width, height), 2, border_radius=5);
+
+    # 메인 루프
     def update(self, deltaTime):
+        # Score 표시
+        scoreText = self.defaultFont.render(f"Score : {self.score}", True, Color().black());
+        self.screen.blit(scoreText, (10, 10));
+
+        if self.score >= self.maxScore:
+            scoreColor = Color().red();
+            self.maxScore = self.score;
+        else:
+            scoreColor = Color().black();
+        
+        maxScoreText = self.defaultFont.render(f"Max Score : {self.maxScore}", True, scoreColor);
+        self.screen.blit(maxScoreText, (10, 30));
+
+        # 체력 표시
+        self.drawHealthBar(
+            surface=self.screen,
+            x = Screen().getWidth(),
+            y = 10,
+            width=200,
+            height=25,
+            currentHealth=self.player.health,
+            maxHealth=5
+        );
+
         # 키 입력 감지
         pressedKeys = pygame.key.get_pressed();
     
@@ -173,9 +269,9 @@ class Game:
 
         if pressedKeys[pygame.K_LCTRL]:
             if pressedKeys[pygame.K_LEFT]:
-                self.player.dodge("left", deltaTime);
+                self.player.dodge("left");
             elif pressedKeys[pygame.K_RIGHT]:
-                self.player.dodge("right", deltaTime);
+                self.player.dodge("right");
         
         self.player.update(deltaTime);
 
@@ -210,6 +306,14 @@ class Game:
             j = 0;
             while j < len(self.bullets):
                 if self.monsters[i].takeHit(self.bullets[j]):
+                    # Score
+                    if isinstance(self.monsters[i], MobFly):
+                        self.score += 1000;
+                    elif isinstance(self.monsters[i], MobBee):
+                        self.score += 5000;
+                    elif isinstance(self.monsters[i], MobWater):
+                        self.score += 10000;
+                    
                     del self.monsters[i];
                     del self.bullets[j];
                     i -= 1;
@@ -224,12 +328,14 @@ class Game:
                     self.isDeath = self.player.damage(monster);
                     monster.isDamaged = True;
                     if self.isDeath:
-                        self.screen.blit(self.gameOverImage, (Screen().getCenterX() - 50, Screen().getCenterY() - 50));
-                        while True:
-                            for event in pygame.event.get():
-                                if event.type == pygame.QUIT:
-                                    sys.exit();
-                            pygame.display.update();
+                        if self.score > self.maxScore:
+                            self.maxScore = self.score;
+                        self.lastScore = self.score;
+                        self.reset();
+                        self.title();
+    
+
+
     def run(self):
         # 타이틀 먼저
         if not self.isTitle:

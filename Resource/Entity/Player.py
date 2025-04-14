@@ -2,7 +2,7 @@ from ..Data.Screen import Screen;
 from ..System.PathLoader import imageLoader;
 from ..System.ImageEditor import rescale;
 from .Entity import Entity;
-import pygame;
+import pygame, time;
 
 # 플레이어
 class Player(Entity):
@@ -20,14 +20,17 @@ class Player(Entity):
 
         # Dodge
         self.isDodging = False;
-        self.dodgeTime = 0;
+        self.dodgeSpeed = self.speed * 2;
+        self.dodgeTime = 0.15;
         self.dodgeCooldown = 0.5;
         self.dodgeTimer = 0;
+        self.dodgeDirection = 0;
+        self.lastAfterImageTime = 0;
 
         # Invincible
         self.isInvincible = False;
         self.invincibleTime = 0;
-        self.invincibleDuration = 1.0; # 지속 시간 (초)
+        self.invincibleDuration = 0.15; # 지속 시간 (초)
 
         # Image
         self.image = [
@@ -40,6 +43,9 @@ class Player(Entity):
         # Center
         self.centerX = self.size / 2;
         self.centerY = self.size / 2;
+    
+        # 잔상
+        self.afterImages = [];
 
     def move(self, keys, deltaTime):
         # 회피 중에 일반 기동 방지
@@ -61,9 +67,22 @@ class Player(Entity):
             if not self.isAttack:
                 self.heading = 1;
     def draw(self, screen):
+        # 잔상 그리기
+        now = time.time();
+        for image, pos, createdTime, in self.afterImages[:]:
+            if now - createdTime > 0.3: # 잔상 지속 시간
+                self.afterImages.remove((image, pos, createdTime));
+                continue;
+            tempImage = image.copy();
+            tempImage.set_alpha(100);
+            screen.blit(tempImage, pos);
+        
         screen.blit(self.image[self.heading], (self.x, self.y));
     
     def attack(self, bullets):
+        if self.isDodging:
+            return;
+
         from .Bullet import Bullet;
         self.isAttack = True;
         # 몇발 쐈는지 체크하는 변수
@@ -102,7 +121,7 @@ class Player(Entity):
             return False;
 
     # 회피
-    def dodge(self, direction, deltaTime):
+    def dodge(self, direction):
         if self.dodgeTimer > 0:
             return;
 
@@ -110,22 +129,43 @@ class Player(Entity):
         self.isInvincible = True;
         self.invincibleTime = self.invincibleDuration;
 
-        dodgeDistance = self.size;
-        if direction == "left" and self.x > 0:
-            self.x = max(0, self.x - dodgeDistance);
-        elif direction == "right" and self.x < Screen().getWidth() - self.size:
-            self.x = min(Screen().getWidth() - self.size, self.x + dodgeDistance);
+        self.dodgeStartTime = time.time();
 
+        if direction == "left" and self.x > 0:
+            self.dodgeDirection = -1;
+        elif direction == "right" and self.x < Screen().getWidth() - self.size:
+            self.dodgeDirection = 1;
+        
         # 타이머
-        self.dodgeTime = 0.2; # Dodge 지속 시간
         self.dodgeTimer = self.dodgeCooldown;
+    
+        afterImage = (self.image[self.heading].copy(), (self.x, self.y), time.time());
+        self.afterImages.append(afterImage);
 
     # 자체 업데이트
     def update(self, deltaTime):
         if self.isDodging:
-            self.dodgeTime -= deltaTime;
-            if self.dodgeTime <= 0:
-                self.isDodging = False;
+            if time.time() - self.dodgeStartTime < self.dodgeTime:  # Dodge가 끝날 때까지
+                new_x = self.x + self.dodgeDirection * self.dodgeSpeed * deltaTime;
+
+                # 벽 충돌 감지
+                if new_x < 0:  # 왼쪽 벽
+                    new_x = 0;
+                    self.isDodging = False;  # 회피 종료
+                elif new_x > Screen().getWidth() - self.size:  # 오른쪽 벽
+                    new_x = Screen().getWidth() - self.size;
+                    self.isDodging = False;  # 회피 종료
+                
+                self.x = new_x;  # 최종적으로 x 값 설정
+
+                self.x += self.dodgeDirection * self.dodgeSpeed * deltaTime;  # x 값을 점진적으로 변경
+                if time.time() - self.lastAfterImageTime > 0.05:  # 간격을 두고 잔상 추가
+                    afterImage = (self.image[self.heading].copy(), (self.x, self.y), time.time());
+                    self.afterImages.append(afterImage);
+                    self.lastAfterImageTime = time.time();
+            else:
+                self.isDodging = False;  # Dodge 종료
+                self.dodgeDirection = 0;
         
         # 무적 시간
         if self.isInvincible:
