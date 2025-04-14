@@ -237,7 +237,9 @@ class Game:
                     for _, rect, label, _ in buttons:
                         if rect.collidepoint(mousePos):
                             if label == "타이틀로":
+                                self.reset();
                                 self.title();
+                                self.run();
                             elif label == "게임 종료":
                                 pygame.quit();
                                 sys.exit();
