@@ -22,6 +22,7 @@ class Game:
         # 기초 설정
         pygame.init();
         pygame.display.set_caption("Bug Knights Shooter Edition - 벌레 전사의 새로운 모험");
+        pygame.display.set_icon(load(imageLoader("bug_knights.ico")));
 
         self.clock = pygame.time.Clock();
         self.screen = pygame.display.set_mode(Screen().getSize());
