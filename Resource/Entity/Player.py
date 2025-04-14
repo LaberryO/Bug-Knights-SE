@@ -18,6 +18,17 @@ class Player(Entity):
         self.defaultSpeed = self.speed;
         self.health = 5;
 
+        # Dodge
+        self.isDodging = False;
+        self.dodgeTime = 0;
+        self.dodgeCooldown = 0.5;
+        self.dodgeTimer = 0;
+
+        # Invincible
+        self.isInvincible = False;
+        self.invincibleTime = 0;
+        self.invincibleDuration = 1.0; # 지속 시간 (초)
+
         # Image
         self.image = [
             rescale(imageLoader("player_0.png"), self.size),
@@ -31,6 +42,9 @@ class Player(Entity):
         self.centerY = self.size / 2;
 
     def move(self, keys, deltaTime):
+        # 회피 중에 일반 기동 방지
+        if self.isDodging:
+            return;
         # 공격 중에 위 보고 속도 느려지게
         if self.isAttack:
             self.speed = self.defaultSpeed / 2;
@@ -78,9 +92,47 @@ class Player(Entity):
         )
     
     def damage(self, monster):
+        if self.isInvincible:
+            return False;
+    
         self.health -= monster.damage;
         if self.health <= 0:
             return True;
         else:
             return False;
+
+    # 회피
+    def dodge(self, direction, deltaTime):
+        if self.dodgeTimer > 0:
+            return;
+
+        self.isDodging = True;
+        self.isInvincible = True;
+        self.invincibleTime = self.invincibleDuration;
+
+        dodgeDistance = self.size;
+        if direction == "left" and self.x > 0:
+            self.x = max(0, self.x - dodgeDistance);
+        elif direction == "right" and self.x < Screen().getWidth() - self.size:
+            self.x = min(Screen().getWidth() - self.size, self.x + dodgeDistance);
+
+        # 타이머
+        self.dodgeTime = 0.2; # Dodge 지속 시간
+        self.dodgeTimer = self.dodgeCooldown;
+
+    # 자체 업데이트
+    def update(self, deltaTime):
+        if self.isDodging:
+            self.dodgeTime -= deltaTime;
+            if self.dodgeTime <= 0:
+                self.isDodging = False;
+        
+        # 무적 시간
+        if self.isInvincible:
+            self.invincibleTime -= deltaTime;
+            if self.invincibleTime <= 0:
+                self.isInvincible = False;
+
+        if self.dodgeTimer > 0:
+            self.dodgeTimer -= deltaTime;
 

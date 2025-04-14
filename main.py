@@ -107,6 +107,14 @@ while inGame:
     
     # 플레이어 움직임
     player.move(pressedKeys, deltaTime);
+    player.update(deltaTime);
+
+    if pressedKeys[pygame.K_LCTRL]:
+        if pressedKeys[pygame.K_LEFT]:
+            player.dodge("left", deltaTime);
+        elif pressedKeys[pygame.K_RIGHT]:
+            player.dodge("right", deltaTime);
+    
     player.draw(screen);
 
     # 몬스터 움직임
