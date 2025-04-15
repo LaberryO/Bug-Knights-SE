@@ -1,4 +1,24 @@
-# Bug Knights Shooter Edition
-Pygame 라이브러리로 제작되었습니다.
+Bug Knights Shooter Edition
+=============
 
-개발자: LaberryO (라베리)
+# Language
+- Python 100%
+    - pygame 사용
+
+# Pre-Release Develop Date (v0.1.0 alpha)
+- 2025-03-26 ~ 2025-04-14
+
+# Tools
+- Visual Studio Code (Programming)
+- Piskel (Object Design)
+- Miricanvas (Ui Design)
+- ChatGPT, Copilot
+
+# Fonts
+- Nanum Barun Gothic (나눔바른고딕) : https://hangeul.naver.com/fonts/search?f=nanum
+
+# Developer
+- LaberryO (라베리)
+
+# Special Thanks
+- IT소프트웨어과 선생님들
