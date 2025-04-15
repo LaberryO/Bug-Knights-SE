@@ -89,4 +89,14 @@ class MobBee(Entity):
 
     def takeHit(self, bullets):
         # 피타고라스 정리를 활용한 원형 거리 계산법
-        return (self.x + self.size / 2 - bullets.x)**2 + (self.y + self.size / 2 - bullets.y)**2 < (self.size / 2)**2
+        if bullets.attackType == "allAttackSkill":
+            # Monster의 Rect 생성
+            mobRect = pygame.Rect(self.x, self.y, self.size, self.size);
+
+            # 총알의 Rect
+            bulletRect = pygame.Rect(bullets.graphic.x, bullets.graphic.y, Screen().getWidth(), bullets.tempHeight);
+
+            # Rect 충돌 확인
+            return mobRect.colliderect(bulletRect);
+        else:
+            return (self.x + self.size / 2 - bullets.x)**2 + (self.y + self.size / 2 - bullets.y)**2 < (self.size / 2)**2;

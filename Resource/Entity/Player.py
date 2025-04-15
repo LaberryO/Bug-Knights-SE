@@ -94,7 +94,7 @@ class Player(Entity):
         self.isAttack = True;
         # 몇발 쐈는지 체크하는 변수
         self.shots += 1;
-        bullets.append(Bullet(self, self.x + self.centerX));
+        bullets.append(Bullet(self, self.x + self.centerX, "normalAttack"));
 
     def idle(self):
         self.isAttack = False;
@@ -160,7 +160,7 @@ class Player(Entity):
     
         from .Bullet import Bullet
         for offset in range(0, Screen().getWidth(), 10):
-            bullets.append(Bullet(self, offset));
+            bullets.append(Bullet(self, offset, "allAttackSkill"));
 
     # 자체 업데이트
     def update(self, deltaTime):

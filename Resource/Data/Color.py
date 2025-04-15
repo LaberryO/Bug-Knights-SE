@@ -16,6 +16,9 @@ class Color:
     def red(self):
         return (255, 0, 0);
 
+    def aqua(self):
+        return (0, 255, 255);
+
     def green(self):
         return (0, 255, 0);
 
