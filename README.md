@@ -1,7 +1,7 @@
 Bug Knights Shooter Edition
 =============
 
-# 주의사항 Caution
+## ⚠️ 주의사항 Caution
 - 압축 파일 내에 있는 "_internal" 폴더는 삭제되면 안됩니다.
 - The "_internal" folder inside the compressed file should not be deleted.
 
