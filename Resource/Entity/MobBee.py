@@ -1,20 +1,16 @@
 from ..Data.Screen import Screen;
 from ..System.PathLoader import imageLoader;
 from ..System.ImageEditor import rescale;
-from .Entity import Entity;
+from .Monster import Monster;
 
-import random, pygame, math, time;
+import math, time;
 
 # 벌 (몬스터)
-class MobBee(Entity):
+class MobBee(Monster):
     def __init__(self, player):
-        self.size = 48;
-        self.x = random.randint(0, Screen().getWidth() - self.size);
-        self.y = -100;
-        self.dy = 0.1;
-        self.accSpeed = 0.15;
-        self.damage = 1;
-        self.isDamaged = False;
+        super().__init__();
+
+        # MobBee Init
         self.hitSpeed = 2.5; # 벌이 플레이어에게 돌진하는 속도
         self.detectRange = Screen().getCenterY(); # 감지 범위
         self.alertTime = 1.0; # 경고 시간 (초)
@@ -31,11 +27,6 @@ class MobBee(Entity):
         ];
 
         self.alertImage = rescale(imageLoader("mobBee_2.png"), self.size);
-
-        # 애니메이션 변수
-        self.currentFrame = 0;
-        self.frameTime = 0.0; # 누적 시간 저장
-        self.frameInterval = 0.25; # 초 기준
     def move(self, deltaTime):
         target_x = self.player.x + self.player.size / 2;
         target_y = self.player.y + self.player.size / 2;
@@ -71,25 +62,16 @@ class MobBee(Entity):
             self.x += self.direction[0] * self.hitSpeed * deltaTime;
             self.y += self.direction[1] * self.hitSpeed * deltaTime;
     
-        self.frameTime += deltaTime;
-        if self.frameTime >= self.frameInterval:
-            self.frameTime = 0;
-            # 애니메이션 확장성을 위한 구문
-            # 일종의 시계처럼 계속 루프함.
-            self.currentFrame = (self.currentFrame + 1) % len(self.image);
+        super().move(deltaTime);
 
     def draw(self, screen):
         if self.state == "alert":
             screen.blit(self.alertImage, (self.x, self.y));
         else:
-            screen.blit(self.image[self.currentFrame], (self.x, self.y));
+            super().draw(screen);
 
     def offScreen(self):
-        return self.y > Screen().getHeight();
+        return super().offScreen();
 
     def takeHit(self, bullets):
-        # 피타고라스 정리를 활용한 원형 거리 계산법
-        if bullets.attackType == "allAttackSkill":
-            return self.y < bullets.graphic.y + bullets.tempHeight and self.y + self.size > bullets.graphic.y;
-        else:
-            return (self.x + self.size / 2 - bullets.x)**2 + (self.y + self.size / 2 - bullets.y)**2 < (self.size / 2)**2;
+        return super().takeHit(bullets);

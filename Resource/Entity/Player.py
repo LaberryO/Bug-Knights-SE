@@ -1,11 +1,10 @@
 from ..Data.Screen import Screen;
 from ..System.PathLoader import imageLoader;
 from ..System.ImageEditor import rescale;
-from .Entity import Entity;
 import pygame, time;
 
 # 플레이어
-class Player(Entity):
+class Player():
     # 초기값 설정
     def __init__(self):
         self.size = 64;

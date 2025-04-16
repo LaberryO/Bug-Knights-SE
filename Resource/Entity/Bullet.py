@@ -1,5 +1,4 @@
 # Bullet.py 탄막 객체
-from .Entity import Entity;
 from ..Data.Screen import Screen;
 from ..Data.Color import Color;
 from ..System.PathLoader import imageLoader;
@@ -7,7 +6,7 @@ import pygame;
 from pygame.image import load;
 from pygame.transform import scale;
 
-class Bullet(Entity):
+class Bullet():
     def __init__(self, player, x, attackType):
         self.player = player
         self.x = x;
@@ -41,7 +40,6 @@ class Bullet(Entity):
             pygame.draw.rect(screen, Color().aqua(), self.graphic);
         else:
             screen.blit(self.graphic, (self.x - self.size/2, self.y + self.tempHeight/2));
-        
 
     def offScreen(self):
         return self.y < -self.tempHeight;
